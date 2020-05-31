@@ -1,0 +1,88 @@
+
+
+FUNCTION_BLOCK tipper	
+VAR_INPUT				
+	suhu : REAL;
+	kelembaban : REAL;
+        angin: REAL;
+END_VAR
+
+VAR_OUTPUT	
+        
+	prediksi: REAL;
+END_VAR
+
+FUZZIFY suhu			
+	TERM dingin := (24, 1) (30, 0); 
+	TERM sedang := (24, 0) (30,1) (35,0);
+	TERM panas := (30, 0) (37,1);
+END_FUZZIFY
+
+FUZZIFY kelembaban			
+	TERM kering := (80, 1) (88,0) ;
+	TERM sedang := (80,0) (88,1) (100,0);
+	TERM lembab := (88,0) (100,1) ;
+END_FUZZIFY
+
+FUZZIFY angin			
+	TERM pelan := (3,1) (4.5,0)  ;
+	TERM sedang := (3,0) (4.5,1) (7,0) ;
+        TERM kencang :=(4.5,0)(7,1) ;
+END_FUZZIFY
+
+
+
+DEFUZZIFY prediksi			
+	TERM cerah := (10,1) (20,0);
+	TERM mendung := (10,0)  (20,1) (50,0);
+	TERM hujan := (20,0) (50,1);
+	METHOD : COG;		
+	DEFAULT := 0;
+END_DEFUZZIFY
+
+
+RULEBLOCK No1
+	AND : MIN;			
+	ACT : MIN;			
+	ACCU : MAX;			
+	RULE 1 : IF suhu IS dingin AND kelembaban IS lembab AND angin IS pelan THEN prediksi IS hujan;
+	RULE 2 : IF suhu IS dingin AND kelembaban IS lembab AND angin IS sedang THEN prediksi IS hujan;
+	RULE 3 : IF suhu IS dingin AND kelembaban IS lembab AND angin IS kencang THEN prediksi IS hujan;
+
+	RULE 4 : IF suhu IS dingin AND kelembaban IS sedang AND angin IS pelan THEN prediksi IS hujan;
+	RULE 5 : IF suhu IS dingin AND kelembaban IS sedang AND angin IS sedang THEN prediksi IS mendung;
+	RULE 6 : IF suhu IS dingin AND kelembaban IS sedang AND angin IS kencang THEN prediksi IS mendung;
+
+	RULE 7 : IF suhu IS dingin AND kelembaban IS kering AND angin IS pelan THEN prediksi IS hujan;
+	RULE 8 : IF suhu IS dingin AND kelembaban IS kering AND angin IS sedang THEN prediksi IS hujan;
+	RULE 9 : IF suhu IS dingin AND kelembaban IS kering AND angin IS kencang THEN prediksi IS mendung;
+
+
+	RULE 10 : IF suhu IS sedang AND kelembaban IS lembab AND angin IS pelan THEN prediksi IS hujan;
+	RULE 11 : IF suhu IS sedang AND kelembaban IS lembab AND angin IS sedang THEN prediksi IS hujan;
+	RULE 12 : IF suhu IS sedang AND kelembaban IS lembab AND angin IS kencang THEN prediksi IS mendung;
+
+	RULE 13 : IF suhu IS sedang AND kelembaban IS sedang AND angin IS pelan THEN prediksi IS mendung;
+	RULE 14 : IF suhu IS sedang AND kelembaban IS sedang AND angin IS sedang THEN prediksi IS mendung;
+	RULE 15 : IF suhu IS sedang AND kelembaban IS sedang AND angin IS kencang THEN prediksi IS cerah;
+
+	RULE 16: IF suhu IS sedang AND kelembaban IS kering AND angin IS pelan THEN prediksi IS mendung;
+	RULE 17 : IF suhu IS sedang AND kelembaban IS kering AND angin IS sedang THEN prediksi IS cerah;
+	RULE 18 : IF suhu IS sedang AND kelembaban IS kering AND angin IS kencang THEN prediksi IS cerah;
+
+
+	RULE 19 : IF suhu IS panas AND kelembaban IS lembab AND angin IS pelan THEN prediksi IS hujan;
+	RULE 20 : IF suhu IS panas AND kelembaban IS lembab AND angin IS sedang THEN prediksi IS mendung;
+	RULE 21 : IF suhu IS panas AND kelembaban IS lembab AND angin IS kencang THEN prediksi IS cerah;
+
+	RULE 22 : IF suhu IS panas AND kelembaban IS sedang AND angin IS pelan THEN prediksi IS mendung;
+	RULE 23 : IF suhu IS panas AND kelembaban IS sedang AND angin IS sedang THEN prediksi IS cerah;
+	RULE 24 : IF suhu IS panas AND kelembaban IS sedang AND angin IS kencang THEN prediksi IS cerah;
+
+	RULE 25: IF suhu IS panas AND kelembaban IS kering AND angin IS pelan THEN prediksi IS cerah;
+	RULE 26 : IF suhu IS panas AND kelembaban IS kering AND angin IS sedang THEN prediksi IS cerah;
+	RULE 27 : IF suhu IS panas AND kelembaban IS kering AND angin IS kencang THEN prediksi IS cerah;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
+
